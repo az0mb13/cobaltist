@@ -5,4 +5,4 @@ Todoist automatically integrates with Gcal and gives reminders.
 
 ## Things to do
 
-[ ] - Add this to the Slackbot's command
+- [ ] Add this to the Slackbot's command
