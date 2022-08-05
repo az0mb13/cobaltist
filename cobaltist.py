@@ -22,14 +22,18 @@ def get_all_orgs():
     json_orgs = orgs.json()
     total_orgs = len(json_orgs['data']) #total number of orgs
     
-
     for i in range(0, total_orgs):
         org_tokens.append(json_orgs["data"][i]['resource']['token'])
 
 
 def get_all_pt():
+    all_tasks = []
     date_of_today = str(datetime.date.today())
     today_is = datetime.datetime.strptime(date_of_today, "%Y-%m-%d")
+
+    tasks = TODO_API.get_tasks(project_id=2290748296, section_id=88110232)
+    for i in tasks:
+        all_tasks.append(i.content)
 
     for token in org_tokens:
         pentests = requests.get(API_URL + '/pentests?limit=1000', headers={'Authorization': 'bearer ' + API_KEY, 'X-Org-Token': token})
@@ -37,9 +41,9 @@ def get_all_pt():
 
         start_date = json_pentests["data"][0]['resource']['start_date']
         pt_start = datetime.datetime.strptime(start_date, "%b %d %Y")
-        pt_name = json_pentests["data"][0]['resource']['title']
+        pt_name = json_pentests["data"][0]['resource']['title']      
 
-        if(pt_start >= today_is):
+        if(pt_start >= today_is and pt_name not in all_tasks):
             task = TODO_API.add_task(content=pt_name, project_id=project_id, section_id=section_id)
             dd1 = (datetime.datetime.strptime(start_date, "%b %d %Y") + datetime.timedelta(days=2)).date()
             TODO_API.add_task(content='Update 1', project_id=project_id, section_id=section_id, parent_id=task.id, due_string=f'{dd1} at 10 pm')
@@ -51,7 +55,7 @@ def get_all_pt():
             TODO_API.add_task(content='Update 4', project_id=project_id, section_id=section_id, parent_id=task.id, due_string=f'{dd4} at 10 pm')
             dd5= (datetime.datetime.strptime(start_date, "%b %d %Y") + datetime.timedelta(days=14)).date()
             TODO_API.add_task(content='Final Update', project_id=project_id, section_id=section_id, parent_id=task.id, due_string=f'{dd5} at 11 pm')
-
+        
 def main():
     get_all_orgs()
     get_all_pt()
